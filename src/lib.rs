@@ -52,3 +52,27 @@ pub mod volatile;
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
+
+#[macro_export]
+macro_rules! extern_sym {
+    ($sym:ident) => { $crate::extern_sym!($sym as ()) };
+    (mut $sym:ident) => { $crate::extern_sym!(mut $sym as ()) };
+    ($sym:ident as $t:ty) => {{
+        #[allow(improper_ctypes)]
+        extern "C" { static $sym: $t; }
+        // SAFETY: The value is not accessed, we only take its address.
+        // The `addr_of!()` macro ensures that no intermediate reference is created.
+        unsafe {
+            ::core::ptr::addr_of!($sym)
+        }
+    }};
+    (mut $sym:ident as $t:ty) => {{
+        #[allow(improper_ctypes)]
+        extern "C" { static $sym: $t; }
+        // SAFETY: The value is not accessed, we only take its address.
+        // The `addr_of_mut!()` macro ensures that no intermediate reference is created.
+        unsafe {
+            ::core::ptr::addr_of_mut!($sym)
+        }
+    }};
+}

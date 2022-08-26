@@ -3,6 +3,9 @@ name    = "libsa"
 version = "0.1.0"
 edition = "2021"
 authors = ["xvanc <xvancm@gmail.com>"]
+description = "Common utilities for low-level, `#![no_std]` environments."
+license = "BSD-3-Clause"
+repository = "https://github.com/bolt-os/libsa"
 
 [features]
 default = []

@@ -30,6 +30,21 @@
 
 //! Common utilities for low-level, `#![no_std]` environments
 
+#![warn(clippy::cargo, clippy::pedantic, clippy::undocumented_unsafe_blocks)]
+#![deny(
+    clippy::semicolon_if_nothing_returned,
+    clippy::debug_assert_with_mut_call
+)]
+#![allow(
+    clippy::cast_lossless,
+    clippy::enum_glob_use,
+    clippy::inline_always,
+    clippy::items_after_statements,
+    clippy::must_use_candidate,
+    clippy::unreadable_literal,
+    clippy::wildcard_imports
+)]
+
 #![cfg_attr(not(test), no_std)]
 
 pub mod endian;

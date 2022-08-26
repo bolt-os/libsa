@@ -44,10 +44,12 @@ impl<T: Copy> Volatile<T> {
     }
 
     pub fn read(&self) -> T {
+        // SAFETY: `Volatile` owns the data it stores.
         unsafe { core::ptr::read_volatile(self.value.get()) }
     }
 
     pub fn write(&self, value: T) {
+        // SAFETY: `Volatile` owns the data it stores.
         unsafe { core::ptr::write_volatile(self.value.get(), value) };
     }
 }

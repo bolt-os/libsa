@@ -32,11 +32,11 @@ use core::cell::UnsafeCell;
 
 /// A wrapper type providing volatile access to a value
 #[repr(transparent)]
-pub struct Volatile<T: Copy> {
+pub struct Volatile<T> {
     value: UnsafeCell<T>,
 }
 
-impl<T: Copy> Volatile<T> {
+impl<T> Volatile<T> {
     pub const fn new(value: T) -> Volatile<T> {
         Self {
             value: UnsafeCell::new(value),
@@ -51,5 +51,45 @@ impl<T: Copy> Volatile<T> {
     pub fn write(&self, value: T) {
         // SAFETY: `Volatile` owns the data it stores.
         unsafe { core::ptr::write_volatile(self.value.get(), value) };
+    }
+}
+
+/// Represents a 64 bit pointer, of which its low and high bits are split in 32-bit-aligned
+/// volatile memory.
+// TODO: endian memes
+#[repr(C)]
+#[cfg(target_pointer_width = "64")]
+#[allow(clippy::module_name_repetitions)]
+pub struct VolatileSplitPtr<T> {
+    low: Volatile<u32>,
+    high: Volatile<u32>,
+    marker: core::marker::PhantomData<T>,
+}
+
+impl<T> VolatileSplitPtr<T> {
+    /// Gets the contained pointer
+    #[inline]
+    pub fn get(&self) -> *mut T {
+        let low = self.low.read();
+        let high = self.high.read();
+
+        (((high as u64) << 32) | (low as u64)) as *mut T
+    }
+
+    /// Sets the contained pointer
+    #[inline]
+    pub fn set(&self, ptr: *mut T) {
+        #![allow(clippy::cast_possible_truncation)]
+        let ptr = ptr as usize;
+
+        self.low.write(ptr as u32);
+        self.high.write((ptr >> 32) as u32);
+    }
+
+    /// Sets the component parts of the contained pointer
+    #[inline]
+    pub fn set_parts(&self, high: u32, low: u32) {
+        self.low.write(low);
+        self.high.write(high);
     }
 }

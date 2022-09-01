@@ -30,18 +30,21 @@
 
 use core::fmt;
 
-macro_rules! big_endian_ints {
-    ($(
-        struct $name:ident = $type:ty;
-    )*) => {$(
-
+macro_rules! endian_ints_common {
+    ($name:ident, $type:ty) => {
         #[repr(transparent)]
         #[derive(Clone, Copy, Default, Eq, Hash, PartialEq, PartialOrd)]
         pub struct $name($type);
 
-        impl fmt::Debug for $name {
+        impl ::core::fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                <$type as fmt::Debug>::fmt(&<$type>::from_be(self.0), f)
+                <$type as fmt::Debug>::fmt(&self.get(), f)
+            }
+        }
+
+        impl ::core::fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                <$type as fmt::Display>::fmt(&self.get(), f)
             }
         }
 
@@ -56,6 +59,39 @@ macro_rules! big_endian_ints {
                 value.get()
             }
         }
+    };
+}
+
+macro_rules! little_endian_ints {
+    ($(
+        struct $name:ident = $type:ty;
+    )*) => {$(
+
+        endian_ints_common!($name, $type);
+
+        impl $name {
+            pub const fn new(value: $type) -> $name {
+                Self(value.to_le())
+            }
+
+            pub const fn get(self) -> $type {
+                <$type>::from_le(self.0)
+            }
+
+            pub fn set(&mut self, value: $type) {
+                self.0 = value.to_le();
+            }
+        }
+
+    )*}
+}
+
+macro_rules! big_endian_ints {
+    ($(
+        struct $name:ident = $type:ty;
+    )*) => {$(
+
+        endian_ints_common!($name, $type);
 
         impl $name {
             pub const fn new(value: $type) -> $name {
@@ -71,6 +107,17 @@ macro_rules! big_endian_ints {
             }
         }
     )*}
+}
+
+little_endian_ints! {
+    struct LittleEndianU16   = u16;
+    struct LittleEndianU32   = u32;
+    struct LittleEndianU64   = u64;
+    struct LittleEndianUsize = usize;
+    struct LittleEndianI16   = i16;
+    struct LittleEndianI32   = i32;
+    struct LittleEndianI64   = i64;
+    struct LittleEndianIsize = isize;
 }
 
 big_endian_ints! {

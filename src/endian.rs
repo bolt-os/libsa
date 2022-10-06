@@ -31,10 +31,13 @@
 use core::fmt;
 
 macro_rules! endian_ints_common {
-    ($name:ident, $type:ty) => {
+    ($name:ident, $short:ident, $type:ty) => {
         #[repr(transparent)]
         #[derive(Clone, Copy, Default, Eq, Hash, PartialEq, PartialOrd)]
         pub struct $name($type);
+
+        #[allow(non_camel_case_types)]
+        pub type $short = $name;
 
         impl ::core::fmt::Debug for $name {
             fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -64,10 +67,10 @@ macro_rules! endian_ints_common {
 
 macro_rules! little_endian_ints {
     ($(
-        struct $name:ident = $type:ty;
+        struct $name:ident = $short:ident = $type:ty;
     )*) => {$(
 
-        endian_ints_common!($name, $type);
+        endian_ints_common!($name, $short, $type);
 
         impl $name {
             pub const fn new(value: $type) -> $name {
@@ -88,10 +91,10 @@ macro_rules! little_endian_ints {
 
 macro_rules! big_endian_ints {
     ($(
-        struct $name:ident = $type:ty;
+        struct $name:ident = $short:ident = $type:ty;
     )*) => {$(
 
-        endian_ints_common!($name, $type);
+        endian_ints_common!($name, $short, $type);
 
         impl $name {
             pub const fn new(value: $type) -> $name {
@@ -110,23 +113,23 @@ macro_rules! big_endian_ints {
 }
 
 little_endian_ints! {
-    struct LittleEndianU16   = u16;
-    struct LittleEndianU32   = u32;
-    struct LittleEndianU64   = u64;
-    struct LittleEndianUsize = usize;
-    struct LittleEndianI16   = i16;
-    struct LittleEndianI32   = i32;
-    struct LittleEndianI64   = i64;
-    struct LittleEndianIsize = isize;
+    struct LittleEndianU16   = u16_le   = u16;
+    struct LittleEndianU32   = u32_le   = u32;
+    struct LittleEndianU64   = u64_le   = u64;
+    struct LittleEndianUsize = usize_le = usize;
+    struct LittleEndianI16   = i16_le   = i16;
+    struct LittleEndianI32   = i32_le   = i32;
+    struct LittleEndianI64   = i64_le   = i64;
+    struct LittleEndianIsize = isize_le = isize;
 }
 
 big_endian_ints! {
-    struct BigEndianU16   = u16;
-    struct BigEndianU32   = u32;
-    struct BigEndianU64   = u64;
-    struct BigEndianUsize = usize;
-    struct BigEndianI16   = i16;
-    struct BigEndianI32   = i32;
-    struct BigEndianI64   = i64;
-    struct BigEndianIsize = isize;
+    struct BigEndianU16   = u16_be   = u16;
+    struct BigEndianU32   = u32_be   = u32;
+    struct BigEndianU64   = u64_be   = u64;
+    struct BigEndianUsize = usize_be = usize;
+    struct BigEndianI16   = i16_be   = i16;
+    struct BigEndianI32   = i32_be   = i32;
+    struct BigEndianI64   = i64_be   = i64;
+    struct BigEndianIsize = isize_be = isize;
 }

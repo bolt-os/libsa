@@ -47,7 +47,9 @@
 
 #![cfg_attr(not(test), no_std)]
 
+#[cfg(feature = "endian")]
 pub mod endian;
+#[cfg(feature = "volatile")]
 pub mod volatile;
 
 #[cfg(feature = "alloc")]

@@ -17,4 +17,7 @@ alloc = []
 endian = []
 volatile = []
 
+bytemuck = ["dep:bytemuck"]
+
 [dependencies]
+bytemuck = { version = "1.14.0", features = ["derive"], optional = true }

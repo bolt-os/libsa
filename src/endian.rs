@@ -149,6 +149,7 @@ macro_rules! endian_ints {
     ) => {$(
 
         #[repr(transparent)]
+        #[cfg_attr(feature = "bytemuck", derive(bytemuck::Pod, bytemuck::Zeroable))]
         #[derive(Clone, Copy, Default, Eq, Hash, PartialEq)]
         pub struct $name($type);
 

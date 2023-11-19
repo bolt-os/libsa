@@ -37,17 +37,20 @@ pub struct Volatile<T> {
 }
 
 impl<T> Volatile<T> {
+    #[inline]
     pub const fn new(value: T) -> Volatile<T> {
         Self {
             value: UnsafeCell::new(value),
         }
     }
 
+    #[inline]
     pub fn read(&self) -> T {
         // SAFETY: `Volatile` owns the data it stores.
         unsafe { core::ptr::read_volatile(self.value.get()) }
     }
 
+    #[inline]
     pub fn write(&self, value: T) {
         // SAFETY: `Volatile` owns the data it stores.
         unsafe { core::ptr::write_volatile(self.value.get(), value) };

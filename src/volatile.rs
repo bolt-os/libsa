@@ -28,7 +28,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-use core::cell::UnsafeCell;
+use core::{cell::UnsafeCell, fmt};
 
 /// A wrapper type providing volatile access to a value
 #[repr(transparent)]
@@ -57,6 +57,13 @@ impl<T> Volatile<T> {
     }
 }
 
+impl<T: fmt::Debug> fmt::Debug for Volatile<T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.read(), f)
+    }
+}
+
 /// Represents a 64 bit pointer, of which its low and high bits are split in 32-bit-aligned
 /// volatile memory.
 // TODO: endian memes
@@ -67,6 +74,13 @@ pub struct VolatileSplitPtr<T> {
     low: Volatile<u32>,
     high: Volatile<u32>,
     marker: core::marker::PhantomData<T>,
+}
+
+impl<T> fmt::Debug for VolatileSplitPtr<T> {
+    #[inline]
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(&self.get(), f)
+    }
 }
 
 impl<T> VolatileSplitPtr<T> {

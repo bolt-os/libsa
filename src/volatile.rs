@@ -64,10 +64,17 @@ impl<T: fmt::Debug> fmt::Debug for Volatile<T> {
     }
 }
 
+impl<T: Default> Default for Volatile<T> {
+    fn default() -> Self {
+        Self::new(T::default())
+    }
+}
+
 /// Represents a 64 bit pointer, of which its low and high bits are split in 32-bit-aligned
 /// volatile memory.
 // TODO: endian memes
 #[repr(C)]
+#[derive(Default)]
 #[cfg(target_pointer_width = "64")]
 #[allow(clippy::module_name_repetitions)]
 pub struct VolatileSplitPtr<T> {
